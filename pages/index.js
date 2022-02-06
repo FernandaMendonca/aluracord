@@ -1,66 +1,23 @@
+import React from 'react';
+
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
+import { useRouter } from 'next/router'
 
 import appConfig from '../config.json';
-
-function GlobalStyle() {
-  return (
-
-<style global jsx>{`
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        list-style: none;
-      }
-      body {
-        font-family: 'Open Sans', sans-serif;
-      }
-      /* App fit Height */ 
-      html, body, #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */ 
-    `}</style>
-  );
-}
-
-
-function Title(props) {
-
-  const Tag = props.tag || 'h1';
-
-  return (
-    <>
-      <Tag> {props.children} </Tag>
-      <style jsx>
-        {
-          `${Tag} {
-            color: ${appConfig.theme.colors.neutrals['050']};
-            font-size: 24px;
-            font-weight: 600;
-          }`
-        }
-      </style>
-    </>
-  )
-
-}
+import { Title } from '../src/components/Title'
 
 
 export default function HomePage() {
-  const username = 'FernandaMendonca';
+
+  const [username, setUsername] = React.useState("FernandaMendonca");
+  const router = useRouter();
+
+  const submit = () => {
+    router.push(`/chat?username=${username}`);
+  }
 
   return (
     <>
-      <GlobalStyle />
       <Box
         styleSheet={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -85,17 +42,28 @@ export default function HomePage() {
           {/* Formulário */}
           <Box
             as="form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              submit();
+            }}
+
             styleSheet={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
             }}
           >
-            <Title tag="h2">Boas vindas de volta!</Title>
+            <Title tag="h2">Boas vindas de volta! {username || ""}</Title>
             <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals['300'] }}>
-              {appConfig.name}
+              {appConfig.name} - nao tem tema
             </Text>
 
             <TextField
+              type='text'
+              value={username}
+              onChange={function (event) {
+                const val = event.target.value;
+                setUsername(val);
+              }}
               fullWidth
               textFieldColors={{
                 neutral: {
@@ -106,6 +74,7 @@ export default function HomePage() {
                 },
               }}
             />
+
             <Button
               type='submit'
               label='Entrar'
@@ -137,13 +106,16 @@ export default function HomePage() {
               minHeight: '240px',
             }}
           >
-            <Image
-              styleSheet={{
-                borderRadius: '50%',
-                marginBottom: '16px',
-              }}
-              src={`https://github.com/${username}.png`}
-            />
+            {username &&
+              <Image
+                styleSheet={{
+                  borderRadius: '50%',
+                  marginBottom: '16px',
+                }}
+                src={`https://github.com/${username}.png`}
+                alt="Profile Picture"
+              />
+            }
             <Text
               variant="body4"
               styleSheet={{
